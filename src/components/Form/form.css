@@ -1,0 +1,38 @@
+.registration-form {
+    /* Overall container styles */
+    text-align: center;
+    padding: 20px;
+  }
+  
+  .registration-form img {
+    /* Image styles */
+    max-width: 300px;
+    margin-bottom: 20px;
+  }
+  
+  .button-container {
+    /* Button container styles */
+    display: flex;
+    justify-content: space-around;
+  }
+  
+  .primary-button,
+  .secondary-button {
+    /* Button styles */
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  
+  .primary-button {
+    /* Primary button styles */
+    background-color: #4CAF50;
+    color: white;
+  }
+  
+  .secondary-button {
+    /* Secondary button styles */
+    background-color: #f2f2f2;
+    color: black;
+  }

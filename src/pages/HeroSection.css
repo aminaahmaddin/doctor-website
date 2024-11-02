@@ -1,0 +1,30 @@
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+}
+
+.hero-section {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px;
+    background-color: #f5f5f5;
+}
+
+.text-container {
+    max-width: 600px;
+    text-align: right; /* Right alignment for text */
+}
+
+.image-container {
+    flex: 1;
+}
+
+.image-container img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 10px; /* Optional: for rounded corners */
+}
+
+  
+  
