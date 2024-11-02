@@ -3,13 +3,14 @@ import { getAuth } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
 
 const firebaseConfig = {
-  apiKey: "YOUR_API_KEY",
-  authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
-  projectId: "YOUR_PROJECT_ID",
-  storageBucket: "YOUR_PROJECT_ID.appspot.com",
-  messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-  appId: "YOUR_APP_ID",
+  apiKey: "AIzaSyDNxwBJKe1W32F1JfP6ToQlfrGsj4zSR00",
+  authDomain: "doctor-app-b524c.firebaseapp.com",
+  projectId: "doctor-app-b524c",
+  storageBucket: "doctor-app-b524c.firebasestorage.app",
+  messagingSenderId: "912788888605",
+  appId: "1:912788888605:web:805b0c2d2df96fd4c03af4"
 };
+
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);

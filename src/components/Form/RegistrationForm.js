@@ -1,128 +1,182 @@
 import React, { useState } from 'react';
-import { getAuth, createUserWithEmailAndPassword } from 'firebase/auth';
+import { auth, db } from '../../Firebase'; // Adjust the path as necessary
+import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { doc, setDoc } from 'firebase/firestore';
-import { db } from '../../Firebase'; // Adjust the path as necessary
-import { useNavigate } from 'react-router-dom';
 
 const RegistrationForm = () => {
-  const [userType, setUserType] = useState('');
+  const [role, setRole] = useState(null);
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [specialization, setSpecialization] = useState('');
-  const [formSubmitted, setFormSubmitted] = useState(false);
-  const navigate = useNavigate();
-  const auth = getAuth();
+  const [age, setAge] = useState('');
+  const [error, setError] = useState('');
 
-  const handleUserTypeSelection = (type) => {
-    setUserType(type);
-  };
-
-  const handleSubmit = async (e) => {
+  // Function to handle the Doctor Registration
+  const handleDoctorRegistration = async (e) => {
     e.preventDefault();
     try {
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
 
-      console.log("User registered:", user.uid); // Log the user's UID
-
-      // Create user in "users" collection
-      console.log("Saving user data to Firestore...");
-      await setDoc(doc(db, "users", user.uid), {
+      // Save doctor information to Firestore
+      await setDoc(doc(db, 'users', user.uid), {
         name,
         email,
-        userType,
-        specialization: userType === 'doctor' ? specialization : null,
+        role: 'doctor',
+        specialization,
       });
 
-      console.log("User data saved to Firestore");
+      // Reset form
+      setName('');
+      setEmail('');
+      setPassword('');
+      setSpecialization('');
+      setError('');
 
-      // Create doctor in "doctors" collection if the user is a doctor
-      if (userType === 'doctor') {
-        console.log("Saving doctor data to Firestore...");
-        await setDoc(doc(db, "doctors", user.uid), {
-          name,
-          email,
-          specialization,
-        });
-        console.log("Doctor data saved to Firestore");
-      }
-
-      setFormSubmitted(true);
-      navigate('/doctors');
-    } catch (error) {
-      console.error("Error saving user data:", error);
+      alert('Doctor registered successfully!');
+    } catch (err) {
+      setError(err.message);
     }
   };
 
-  if (formSubmitted && userType === 'doctor') {
-    return <Doctor name={name} specialization={specialization} />;
-  }
+  // Function to handle the Patient Registration
+  const handlePatientRegistration = async (e) => {
+    e.preventDefault();
+    try {
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      const user = userCredential.user;
+
+      // Save patient information to Firestore
+      await setDoc(doc(db, 'users', user.uid), {
+        name,
+        email,
+        role: 'patient',
+        age,
+      });
+
+      // Reset form
+      setName('');
+      setEmail('');
+      setPassword('');
+      setAge('');
+      setError('');
+
+      alert('Patient registered successfully!');
+    } catch (err) {
+      setError(err.message);
+    }
+  };
 
   return (
-    <form onSubmit={handleSubmit}>
-      <div>
-        <label htmlFor="name">Name:</label>
-        <input
-          type="text"
-          id="name"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          required
-        />
-      </div>
-      <div>
-        <label htmlFor="email">Email:</label>
-        <input
-          type="email"
-          id="email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          required
-        />
-      </div>
-      <div>
-        <label htmlFor="password">Password:</label>
-        <input
-          type="password"
-          id="password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          required
-        />
-      </div>
-      <div>
-        <label>User Type:</label>
-        <button type="button" onClick={() => handleUserTypeSelection('doctor')}>
-          Doctor
-        </button>
-        <button type="button" onClick={() => handleUserTypeSelection('patient')}>
-          Patient
-        </button>
-      </div>
-      {userType === 'doctor' && (
-        <div>
-          <label htmlFor="specialization">Specialization:</label>
-          <input
-            type="text"
-            id="specialization"
-            value={specialization}
-            onChange={(e) => setSpecialization(e.target.value)}
-            required
-          />
+    <div className="flex flex-col items-center justify-center h-screen bg-gray-100">
+      {!role && (
+        <div className="bg-white p-6 rounded shadow-md">
+          <h2 className="text-2xl font-bold mb-4 text-center">Register as</h2>
+          <div className="flex space-x-4">
+            <button
+              onClick={() => setRole('doctor')}
+              className="px-4 py-2 bg-blue-500 text-white font-semibold rounded hover:bg-blue-600"
+            >
+              Register as Doctor
+            </button>
+            <button
+              onClick={() => setRole('patient')}
+              className="px-4 py-2 bg-green-500 text-white font-semibold rounded hover:bg-green-600"
+            >
+              Register as Patient
+            </button>
+          </div>
         </div>
       )}
-      <button type="submit">Register</button>
-    </form>
-  );
-};
 
-// Dummy Doctor component to show after registration
-const Doctor = ({ name, specialization }) => {
-  return (
-    <div className="p-4 bg-white shadow-lg rounded-lg">
-      <h2 className="text-xl font-bold mb-2">Welcome, Dr. {name}!</h2>
-      <p className="text-gray-700">Specialization: {specialization}</p>
+      {role === 'doctor' && (
+        <div className="bg-white p-6 rounded shadow-md">
+          <h2 className="text-2xl font-bold mb-4 text-center">Doctor Registration</h2>
+          <form onSubmit={handleDoctorRegistration}>
+            <input
+              type="text"
+              placeholder="Name"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              className="w-full p-2 mb-3 border border-gray-300 rounded"
+              required
+            />
+            <input
+              type="email"
+              placeholder="Email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="w-full p-2 mb-3 border border-gray-300 rounded"
+              required
+            />
+            <input
+              type="password"
+              placeholder="Password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="w-full p-2 mb-3 border border-gray-300 rounded"
+              required
+            />
+            <input
+              type="text"
+              placeholder="Specialization"
+              value={specialization}
+              onChange={(e) => setSpecialization(e.target.value)}
+              className="w-full p-2 mb-3 border border-gray-300 rounded"
+              required
+            />
+            {error && <p className="text-red-500">{error}</p>}
+            <button className="w-full bg-blue-500 text-white p-2 rounded hover:bg-blue-600">
+              Submit
+            </button>
+          </form>
+        </div>
+      )}
+
+      {role === 'patient' && (
+        <div className="bg-white p-6 rounded shadow-md">
+          <h2 className="text-2xl font-bold mb-4 text-center">Patient Registration</h2>
+          <form onSubmit={handlePatientRegistration}>
+            <input
+              type="text"
+              placeholder="Name"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              className="w-full p-2 mb-3 border border-gray-300 rounded"
+              required
+            />
+            <input
+              type="email"
+              placeholder="Email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="w-full p-2 mb-3 border border-gray-300 rounded"
+              required
+            />
+            <input
+              type="password"
+              placeholder="Password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="w-full p-2 mb-3 border border-gray-300 rounded"
+              required
+            />
+            <input
+              type="text"
+              placeholder="Age"
+              value={age}
+              onChange={(e) => setAge(e.target.value)}
+              className="w-full p-2 mb-3 border border-gray-300 rounded"
+              required
+            />
+            {error && <p className="text-red-500">{error}</p>}
+            <button className="w-full bg-green-500 text-white p-2 rounded hover:bg-green-600">
+              Submit
+            </button>
+          </form>
+        </div>
+      )}
     </div>
   );
 };
